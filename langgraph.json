@@ -1,0 +1,11 @@
+{
+  "dependencies": 
+  [
+    "."
+  ],
+  "graphs": {
+    "agent": "pdf_extractor.py:graph"
+  },
+  "env": ".env",
+  "image_distro": "wolfi"
+}

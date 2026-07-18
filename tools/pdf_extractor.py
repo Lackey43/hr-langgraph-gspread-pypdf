@@ -13,17 +13,9 @@ def extract_pdf(file_url : str) -> list:
 		)
 
 	file = loader.load()
+	# print(file[0])
+	output =  [f.page_content for f in file]
+	string_output = "\n\n".join(output)
+	return string_output
+	
 
-	return [chunk.model_dump(mode="json") for chunk in file]
-
-def display_content(json_data) -> list:
-
-
-	filtered = [chunk["page_content"] for chunk in json_data]
-	return filtered
-
-# if __name__ == "__main__":
-# 	file_url = "claude_daigan_resume.pdf"
-# 	output = extract_pdf(file_url)
-# 	filtered_content = display_content(output)
-# 	print(filtered_content)
