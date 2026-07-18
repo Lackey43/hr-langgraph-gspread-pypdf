@@ -351,9 +351,8 @@ else:
 with st.sidebar:
     st.header("⚙️ Settings")
     st.markdown("""
-    **Model:** Gemini 1.5 Flash  
+    **Model:** Gemini 3.1 Flash Lite  
     **Framework:** LangGraph + Streamlit  
-    **Temperature:** 1.0 (creative feedback)
     """)
     st.divider()
     st.markdown("Made for rapid resume-job matching. For best results, use detailed job descriptions.")
