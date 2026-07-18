@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Resume Fit Analyzer - Streamlit + LangGraph App
-Run with: uv run streamlit run app.py
-"""
-
 import os
 import tempfile
 from typing import TypedDict, Annotated
@@ -19,9 +13,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
 
-# ============================================================
-# PYDANTIC MODELS
-# ============================================================
 
 class PdfExtractor(BaseModel):
     """Structured extraction from resume PDF."""
@@ -50,9 +41,6 @@ class State(TypedDict):
     output: Annotated[list, operator.add]
 
 
-# ============================================================
-# GRAPH NODES
-# ============================================================
 
 def extract_pdf(file_path: str) -> str:
     """Extract clean text from PDF resume."""
@@ -63,13 +51,13 @@ def extract_pdf(file_path: str) -> str:
 
 
 def extract_data(state: State) -> dict:
-    """Node 1: Extract text from the uploaded resume PDF."""
+
     extracted_text = extract_pdf(state["resume_path"])
     return {"extracted": extracted_text}
 
 
 def parse_pdf(state: State) -> dict:
-    """Node 2: Parse extracted text into structured Pydantic model."""
+
     message = structured_ai.invoke(
         [
             SystemMessage(
@@ -83,7 +71,7 @@ def parse_pdf(state: State) -> dict:
 
 
 def show_result(state: State) -> dict:
-    """Node 3: Generate rating (1-10) + detailed feedback using job role + description."""
+
     job_role = state["job_role"]
     job_desc = state.get("job_description", "")
     applicant_data = state["output"][0] if state.get("output") else "No structured data available"
@@ -121,22 +109,18 @@ Please evaluate the candidate and return the rating + detailed feedback."""
     return {"output": [message]}
 
 
-# ============================================================
-# BUILD LANGGRAPH (runs once at import)
-# ============================================================
-
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
 
 if not api_key:
-    # Will be handled gracefully in Streamlit UI
+
     google_model = None
     structured_ai = None
     structured_ai2 = None
     agent = None
 else:
     google_model = ChatGoogleGenerativeAI(
-        model="gemini-3.1-flash-lite",           # ← Change to gemini-2.0-flash or latest if available
+        model="gemini-3.1-flash-lite",           
         api_key=api_key,
         temperature=1.0
     )
@@ -156,9 +140,6 @@ else:
     agent = graph.compile()
 
 
-# ============================================================
-# STREAMLIT UI
-# ============================================================
 
 st.set_page_config(
     page_title="Resume Fit Analyzer",
@@ -167,7 +148,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-st.title("🎯 AI Resume Fit Analyzer")
+st.title("HR AI Resume Fit Analyzer")
 st.markdown(
     "Upload your resume (PDF), enter the job role + description, and get an instant "
     "**rating (1-10)** + professional feedback powered by Gemini + LangGraph."
@@ -175,7 +156,7 @@ st.markdown(
 
 st.divider()
 
-# Input form
+
 with st.form(key="analyzer_form", clear_on_submit=False):
     col1, col2 = st.columns([1, 1])
     
@@ -187,7 +168,7 @@ with st.form(key="analyzer_form", clear_on_submit=False):
         )
     
     with col2:
-        st.write("")  # spacing
+        st.write("")  
 
     job_description = st.text_area(
         "Job Description",
@@ -209,9 +190,9 @@ with st.form(key="analyzer_form", clear_on_submit=False):
         type="primary"
     )
 
-# Processing
+
 if submitted:
-    # Validation
+
     if not api_key:
         st.error("❌ GOOGLE_API_KEY not found. Please create a `.env` file with your Google API key.")
         st.stop()
@@ -226,7 +207,6 @@ if submitted:
         st.error("Please upload a PDF resume.")
         st.stop()
 
-    # Save uploaded PDF to temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(uploaded_file.getvalue())
         resume_path = tmp_file.name
@@ -243,19 +223,16 @@ if submitted:
                 "resume_path": resume_path,
             }
 
-            # Run the LangGraph
+
             result = agent.invoke(initial_state)
 
-            # Extract results (output list accumulates both parsed data + recommendation)
             parsed_resume: PdfExtractor = result["output"][0]
             recommendation: Recommendation = result["output"][1]
 
             status.update(label="✅ Analysis complete!", state="complete", expanded=False)
 
-        # ===================== RESULTS =====================
         st.success("Analysis finished successfully!")
 
-        # Rating display
         st.subheader("📊 Match Rating")
         rating = recommendation.rate
 
@@ -284,11 +261,11 @@ if submitted:
         with col_r2:
             st.progress(rating / 10.0, text=f"Fit Score: {rating} / 10")
 
-        # Feedback
+
         st.subheader("💡 AI Feedback & Recommendations")
         st.markdown(recommendation.recom)
 
-        # Parsed resume details (collapsible)
+
         with st.expander("📄 View Parsed Resume Data (for transparency)", expanded=False):
             st.markdown(f"**Name:** {parsed_resume.name}")
             st.markdown(f"**Age:** {parsed_resume.age} &nbsp;&nbsp;|&nbsp;&nbsp; **Email:** {parsed_resume.email} &nbsp;&nbsp;|&nbsp;&nbsp; **Contact:** {parsed_resume.contact}")
@@ -326,12 +303,11 @@ if submitted:
                 "- Try a different resume or shorten very long job descriptions")
     
     finally:
-        # Always clean up temp file
+
         if os.path.exists(resume_path):
             os.unlink(resume_path)
 
 else:
-    # Welcome / instructions when no submission yet
     st.info(
         "👆 Fill in the job role, paste the job description, upload your resume (PDF), "
         "then click **Analyze Resume Fit**."
@@ -347,7 +323,7 @@ else:
 
     st.caption("Your resume is processed in-memory and the temporary file is deleted immediately after analysis.")
 
-# Sidebar info
+
 with st.sidebar:
     st.header("⚙️ Settings")
     st.markdown("""

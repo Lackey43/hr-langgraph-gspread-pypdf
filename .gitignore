@@ -58,3 +58,4 @@ htmlcov/
 *.log
 logs/
 claude_daigan_resume.pdf
+langgraph.json
