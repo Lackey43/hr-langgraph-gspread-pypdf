@@ -177,8 +177,8 @@ st.set_page_config(
 st.title("HR AI Resume Fit Analyzer")
 st.markdown(
     "Upload your resume (PDF), enter the job role + description, and get an instant "
-    "**rating (1-10)** + professional feedback powered by Gemini + LangGraph.\n\n**Demo by Claude Daigan**"
-    "Check your output at [Google Sheets](https://docs.google.com/spreadsheets/d/1OsGCgyeG76Og5sORQTi4N3ha7nxmYKnzqleaO5o13C4/edit?gid=469343244#gid=469343244)!"
+    "**rating (1-10)** + professional feedback powered by Gemini + LangGraph.\n\n**Demo by Claude Daigan**\n"
+    "Check your output in [Google Sheets](https://docs.google.com/spreadsheets/d/1OsGCgyeG76Og5sORQTi4N3ha7nxmYKnzqleaO5o13C4/edit?gid=469343244#gid=469343244)!"
 )
 
 st.divider()
