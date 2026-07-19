@@ -3,7 +3,7 @@ langchain-core
 langchain-google-genai
 pydantic>=2.13.4
 pydantic-core
-dotenv",
+dotenv
 langchain-community
 langchain-unstructured[local]
 unstructured
