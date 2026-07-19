@@ -12,6 +12,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
+from tools.google_sheets import append_to_google_sheet
+
 
 class PdfExtractor(BaseModel):
     """Structured extraction from resume PDF."""
@@ -76,6 +78,13 @@ def parse_pdf(state: State) -> dict:
             HumanMessage(f"Resume text:\n{state['extracted']}"),
         ]
     )
+    skills = "\n".join(message.skills)
+    wokrexp = "\n".join(message.work_experience)
+    certs = "\n".join(message.certificates)
+    print(skills)
+    data =  [message.name, message.email, message.contact, message.age, wokrexp, skills, certs]
+    print(data)
+    append_to_google_sheet(column="A",values=data)
     return {"output": [message]}
 
 
@@ -114,6 +123,13 @@ Please evaluate the candidate and return the rating + detailed feedback."""
     message = structured_ai2.invoke(
         [SystemMessage(system_prompt), HumanMessage(human_prompt)]
     )
+
+    data =  [message.rate, message.recom, state["job_role"], state["job_description"]]
+
+
+
+    print(data)
+    append_to_google_sheet(column="H",values=data)
     return {"output": [message]}
 
 
