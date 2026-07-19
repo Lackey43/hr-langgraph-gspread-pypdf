@@ -82,9 +82,17 @@ def parse_pdf(state: State) -> dict:
     wokrexp = "\n".join(message.work_experience)
     certs = "\n".join(message.certificates)
     print(skills)
-    data =  [message.name, message.email, message.contact, message.age, wokrexp, skills, certs]
+    data = [
+        message.name,
+        message.email,
+        message.contact,
+        message.age,
+        wokrexp,
+        skills,
+        certs,
+    ]
     print(data)
-    append_to_google_sheet(column="A",values=data)
+    append_to_google_sheet(column="A", values=data)
     return {"output": [message]}
 
 
@@ -124,12 +132,10 @@ Please evaluate the candidate and return the rating + detailed feedback."""
         [SystemMessage(system_prompt), HumanMessage(human_prompt)]
     )
 
-    data =  [message.rate, message.recom, state["job_role"], state["job_description"]]
-
-
+    data = [message.rate, message.recom, state["job_role"], state["job_description"]]
 
     print(data)
-    append_to_google_sheet(column="H",values=data)
+    append_to_google_sheet(column="H", values=data)
     return {"output": [message]}
 
 
@@ -361,4 +367,3 @@ with st.sidebar:
     st.markdown(
         "Made for rapid resume-job matching. For best results, use detailed job descriptions."
     )
-
