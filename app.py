@@ -149,7 +149,7 @@ if not api_key:
     agent = None
 else:
     google_model = ChatGoogleGenerativeAI(
-        model="gemini-3.1-flash-lite", api_key=api_key, temperature=1.0
+        model="gemini-3.5-flash-lite", api_key=api_key, temperature=1.0
     )
     structured_ai = google_model.with_structured_output(PdfExtractor)
     structured_ai2 = google_model.with_structured_output(Recommendation)
