@@ -1,3 +1,4 @@
+import json
 import gspread
 import os
 from dotenv import load_dotenv
@@ -14,7 +15,9 @@ def append_to_google_sheet(values: list[list], column: str):
         "https://www.googleapis.com/auth/drive.file",
     ]
 
-    credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT, scopes=scopes)
+    credentials = Credentials.from_service_account_info(
+        json.loads(SERVICE_ACCOUNT), scopes=scopes
+    )
 
     gc = gspread.authorize(credentials)
     spreadsheet = gc.open_by_key("1OsGCgyeG76Og5sORQTi4N3ha7nxmYKnzqleaO5o13C4")
