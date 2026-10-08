@@ -4,7 +4,6 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 from langgraph.checkpoint.memory import MemorySaver
 from dotenv import load_dotenv
-import os
 
 
 load_dotenv()
@@ -14,11 +13,16 @@ from model.models import google_model
 
 config = {"configurable": {"thread_id": "1"}}
 
+
 # Schema for structured output
 class Route(BaseModel):
-    step: Literal["research", "therapy", "marketing"] = Field(description="Check if query is for research, therapy or marketing")
+    step: Literal["research", "therapy", "marketing"] = Field(
+        description="Check if query is for research, therapy or marketing"
+    )
+
 
 router = google_model.with_structured_output(Route)
+
 
 # State
 class State(TypedDict):
@@ -27,15 +31,14 @@ class State(TypedDict):
     output: str
     messages: Annotated[list, "add_messages"]
 
+
 # Nodes
 def researcher_agent(state: State):
     """Research Agent"""
     result = research_agent.invoke(state["query"])
     print(result)
 
-    return {
-        "messages": result
-    }
+    return {"messages": result}
 
 
 def therapy_agent(state: State):
@@ -43,35 +46,39 @@ def therapy_agent(state: State):
     result = therapist_agent.invoke(state["query"])
     print(result)
 
-    return {
-        "messages": result
-    }
+    return {"messages": result}
+
 
 def marketer_agent(state: State):
     """Marketing Agent"""
     result = marketing_agent.invoke(state["query"])
     print(result)
 
-    return {
-        "messages": result
-    }
+    return {"messages": result}
+
 
 def router_agent(state: State):
     """Route the query"""
-    decision = router.invoke([
-        SystemMessage(content=f"Route the query to research, therapy, or marketing based on the user's request."),
-        HumanMessage(f"This is my query:\n{state["query"]}")
-    ])
+    decision = router.invoke(
+        [
+            SystemMessage(
+                content=f"Route the query to research, therapy, or marketing based on the user's request."
+            ),
+            HumanMessage(f"This is my query:\n{state['query']}"),
+        ]
+    )
     print(decision)
     return {"decision": decision.step}
 
+
 def route_decision(state: State):
-    if state["decision"]== "research":
+    if state["decision"] == "research":
         return "researcher_agent"
     elif state["decision"] == "therapy":
         return "therapy_agent"
     elif state["decision"] == "marketing":
         return "marketer_agent"
+
 
 # Build Graph
 router_builder = StateGraph(State)
@@ -90,7 +97,7 @@ router_builder.add_conditional_edges(
         "researcher_agent": "researcher_agent",
         "therapy_agent": "therapy_agent",
         "marketer_agent": "marketer_agent",
-    }
+    },
 )
 
 router_builder.add_edge("researcher_agent", END)
@@ -109,6 +116,7 @@ if __name__ == "__main__":
         query = input("\nYou: ").strip()
         if query.lower() in ["exit", "quit"]:
             break
-            
+
         result = router_workflow.invoke({"query": query}, config=config)
         print("\nResponse:", result.get("output", "No output"))
+
